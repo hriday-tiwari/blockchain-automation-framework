@@ -30,7 +30,7 @@
   when: network['type'] == 'indy' and item.services.stewards is defined
   tags:
     - molecule-idempotence-notest
-
+#
 - name: Get Elastic IP
   environment:
     AWS_ACCESS_KEY_ID: "{{ aws.access_key }}"
