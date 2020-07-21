@@ -1,0 +1,38 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: partner-webserver
+  annotations:
+    flux.weave.works/automated: "false"
+  namespace: partner-ns
+spec:
+  releaseName: partner-webserver
+  chart:
+    path: examples/identity-app/charts/webserver
+    git: ssh://git@github.com/hriday-tiwari/blockchain-automation-framework.git
+    ref: develop
+  values:
+    metadata:
+      namespace: partner-ns
+      name: partner-webserver
+    organization:
+      name: partner
+    image:
+      pullSecret: regcred
+      init:
+        name: partner-webserver-init
+        repository: alpine:3.9.4
+      server:
+        name: partner-webserver
+        repository: index.docker.io/hyperledgerlabs/von-network-base:1.11.0
+    service:
+      port: 8000
+    vault:
+      address: http://afeeb769d72df4df8a463dd79324f7b6-63398814.us-east-1.elb.amazonaws.com:9000
+      serviceAccountName: partner-partner-trustee-vault-auth
+      authPath: kubernetes-partner-partner-trustee-auth
+      trusteeName: partner-trustee
+      role: ro
+    storage:
+      size: 128Mi
+      className: partner-aws-baremetal-storageclass
