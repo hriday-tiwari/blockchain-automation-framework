@@ -1,0 +1,38 @@
+apiVersion: flux.weave.works/v1beta1
+kind: HelmRelease
+metadata:
+  name: provider-webserver
+  annotations:
+    flux.weave.works/automated: "false"
+  namespace: provider-ns
+spec:
+  releaseName: provider-webserver
+  chart:
+    path: examples/identity-app/charts/webserver
+    git: ssh://git@github.com/hriday-tiwari/blockchain-automation-framework.git
+    ref: develop
+  values:
+    metadata:
+      namespace: provider-ns
+      name: provider-webserver
+    organization:
+      name: provider
+    image:
+      pullSecret: regcred
+      init:
+        name: provider-webserver-init
+        repository: alpine:3.9.4
+      server:
+        name: provider-webserver
+        repository: index.docker.io/hyperledgerlabs/von-network-base:1.11.0
+    service:
+      port: 8000
+    vault:
+      address: http://afeeb769d72df4df8a463dd79324f7b6-63398814.us-east-1.elb.amazonaws.com:9000
+      serviceAccountName: provider-provider-trustee-vault-auth
+      authPath: kubernetes-provider-provider-trustee-auth
+      trusteeName: provider-trustee
+      role: ro
+    storage:
+      size: 128Mi
+      className: provider-aws-baremetal-storageclass
